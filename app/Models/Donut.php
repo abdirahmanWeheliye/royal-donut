@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Donut extends Model
 {
     use HasFactory;
+
+    protected $table = 'donuts';
+
+    protected $fillable = ['name', 'seal_of_approval', 'price', 'created_at'];
+
+    protected $casts = [
+        'price' => 'float',
+    ];
 }

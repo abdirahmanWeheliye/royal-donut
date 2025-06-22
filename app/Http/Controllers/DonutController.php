@@ -1,5 +1,8 @@
 <?php
 
+namespace App\Http\Controllers;
+
+use App\Models\Donut;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -7,7 +10,7 @@ class DonutController extends Controller
 {
     public function index()
     {
-        return response()->json(DB::table('donuts')->get());
+        return response()->json(Donut::all());
     }
 
     public function store(Request $request)
