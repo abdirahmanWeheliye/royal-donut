@@ -11,7 +11,7 @@ class Donut extends Model
 
     protected $table = 'donuts';
 
-    protected $fillable = ['name', 'seal_of_approval', 'price', 'created_at'];
+    protected $fillable = ['name', 'seal_of_approval', 'price', 'created_at', 'image'];
 
     protected $casts = [
         'price' => 'float',

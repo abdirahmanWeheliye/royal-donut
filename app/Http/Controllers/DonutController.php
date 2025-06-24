@@ -16,20 +16,26 @@ class DonutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
-            'seal_of_approval' => 'required|integer',
-            'price' => 'required|numeric'
+            'name' => 'required|string|max:255',
+            'seal_of_approval' => 'required|integer|min:1|max:5',
+            'price' => 'required|numeric|min:0.01',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $id = DB::table('donuts')->insertGetId([
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('donut-images', 'public');
+        }
+
+        $donut = Donut::create([
             'name' => $request->name,
             'seal_of_approval' => $request->seal_of_approval,
             'price' => $request->price,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'image' => $imagePath,
         ]);
 
-        return response()->json(DB::table('donuts')->where('id', $id)->first(), 201);
+        return response()->json($donut, 201);
     }
 
     public function destroy($id)

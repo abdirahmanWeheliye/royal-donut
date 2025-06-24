@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('seal_of_approval');
             $table->decimal('price', 5, 2);
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

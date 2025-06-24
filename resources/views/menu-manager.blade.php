@@ -44,6 +44,9 @@
             <input type="number" id="donut-price" placeholder="Price" step="0.1" required
                 class="w-full mb-5 px-4 py-2 rounded border border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 
+            <!-- Image Upload Field -->
+            <input type="file" id="donut-image" accept="image/*" class="input" />
+
             <div class="flex justify-between">
                 <button onclick="submitDonut()"
                     class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">
@@ -72,21 +75,18 @@
             list.innerHTML = '';
             data.forEach(donut => {
                 const card = document.createElement('div');
-                card.className =
-                    'bg-white p-5 rounded-lg shadow hover:shadow-lg transition flex flex-col justify-between';
+                card.className = 'donut-card p-4 border rounded-lg shadow bg-white space-y-2';
+
+                const imageUrl = donut.image ? `/storage/${donut.image}` : null;
+
                 card.innerHTML = `
-          <div>
-            <h3 class="text-xl font-semibold text-indigo-700 mb-1">${donut.name}</h3>
-            <p class="text-gray-600">Seal of Approval: <span class="font-medium">${donut.seal_of_approval}</span></p>
-            <p class="text-gray-600">Price: <span class="font-medium">$${parseFloat(donut.price).toFixed(2)}</span></p>
-          </div>
-          <button
-            onclick="deleteDonut(${donut.id})"
-            class="mt-4 self-start bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition"
-          >
-            Delete
-          </button>
-        `;
+      ${imageUrl ? `<img src="${imageUrl}" alt="${donut.name}" class="w-full h-48 object-cover rounded" />` : ''}
+      <h3 class="text-xl font-semibold">${donut.name}</h3>
+      <p>Seal of Approval: ${donut.seal_of_approval}</p>
+      <p>Price: $${parseFloat(donut.price).toFixed(2)}</p>
+      <button onclick="deleteDonut(${donut.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+    `;
+
                 list.appendChild(card);
             });
         }
@@ -113,6 +113,7 @@
             const name = document.getElementById('donut-name').value.trim();
             const seal = parseInt(document.getElementById('donut-seal').value);
             const price = parseFloat(document.getElementById('donut-price').value);
+            const imageFile = document.getElementById('donut-image').files[0];
 
             if (!name || isNaN(seal) || isNaN(price)) {
                 return alert('Please fill all fields correctly.');
@@ -122,16 +123,17 @@
                 return alert('Price must be greater than 0.');
             }
 
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('seal_of_approval', seal);
+            formData.append('price', price);
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
             await fetch('/api/create-donut', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name,
-                    seal_of_approval: seal,
-                    price
-                })
+                body: formData,
             });
 
             cancelAddDonut();
@@ -142,6 +144,7 @@
             document.getElementById('donut-name').value = '';
             document.getElementById('donut-seal').value = '';
             document.getElementById('donut-price').value = '';
+            document.getElementById('donut-image').value = '';
         }
 
         window.onload = fetchAndRenderDonuts;
